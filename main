@@ -1,0 +1,615 @@
+from tkinter import *
+from PIL import Image,ImageTk
+from tkinter import ttk
+import mysql.connector
+from tkinter import messagebox
+
+class PharmacyManagementSyatem:
+    def __init__(self,root):
+        self.root=root
+        self.root.title("Medpro Pharma Management")
+        self.root.geometry("1550x800+0+0")
+
+#ADD MED VARIABLES=====================================================================================================================================================================================================================================================
+        self.addmedvar=StringVar()
+        self.refmed=StringVar()
+
+#Main Text Variables=====================================================================================================================================================================================================================================================
+
+        self.ref_var=StringVar()
+        self.cmpName_var=StringVar()
+        self.typeMed_var=StringVar()
+        self.medName_var=StringVar()
+        self.lot_var=StringVar()
+        self.issuedate_var=StringVar()
+        self.expdate_var=StringVar()
+        self.uses_var=StringVar()
+        self.sideEffect_var=StringVar()
+        self.warning_var=StringVar()
+        self.dosage_var=StringVar()
+        self.price_var=StringVar()
+        self.product_var=StringVar()
+
+
+        lbltitle=Label(self.root,text="Medpro Parmaceuticals Manager", bd=15,relief=RIDGE,
+                       bg='white',fg="dark seagreen", font =('times', 50,"bold"),padx=2,pady=4)
+        lbltitle.pack(side=TOP, fill=X)
+
+        
+
+#Image1(Logo)=====================================================================================================================================================================================================================================================
+        img1=Image.open("/Users/aryashrestha/Desktop/medpro/295336542_739067574031056_4221966400700162040_n.jpg")
+        img1=img1.resize((70,70),Image.LANCZOS)
+        self.photoimg1=ImageTk.PhotoImage(img1)
+        b1=Button(self.root,image=self.photoimg1,borderwidth=0)
+        b1.place(x=70,y=15)
+
+#Data Frame=====================================================================================================================================================================================================================================================
+
+        DataFrame=Frame(self.root,bd=15,relief=RIDGE,padx=20)
+        DataFrame.place(x=0,y=120,width=1530,height=400)
+
+        DataFrameLeft=LabelFrame(DataFrame,bd=10,relief=RIDGE,padx=20,text="MEDICINE INFORMATION",fg="dark green", font =('arial', 12,"bold"))
+        DataFrameLeft.place(x=0,y=5,width=900,height=350)
+
+#Button Frame=====================================================================================================================================================================================================================================================
+        ButtonFrame=Frame(self.root,bd=15,relief=RIDGE,padx=20)
+        ButtonFrame.place(x=0,y=520,width=1530,height=65)
+
+#LEFT FRAME BUTTONS=====================================================================================================================================================================================================================================================
+        btnAddData=Button(ButtonFrame,command=self.add_data,text="Add Medicine",font =('arial', 17,"bold"),width=13,bg="white", fg="dark seagreen")
+        btnAddData.grid(row=0,column=0)
+        
+        btnAddData=Button(ButtonFrame,command=self.Update,text="Update",font =('arial', 17,"bold"),width=13,bg="white", fg="dark seagreen")
+        btnAddData.grid(row=0,column=1)
+
+        btnDeleteData=Button(ButtonFrame,command=self.Delete,text="Delete",font =('arial', 17,"bold"),bg="red", fg="red")
+        btnDeleteData.grid(row=0,column=2)
+
+        btnResetData=Button(ButtonFrame,command=self.reset,text="Reset",font =('arial', 17,"bold"),width=13,bg="white", fg="dark seagreen")
+        btnResetData.grid(row=0,column=3)
+
+        btnExitData=Button(ButtonFrame,text="Exit",font =('arial', 17,"bold"),width=13,bg="white", fg="dark seagreen")
+        btnExitData.grid(row=0,column=4)
+
+#Search Label=====================================================================================================================================================================================================================================================
+        lblSearch=Label(ButtonFrame,font =('arial', 17,"bold"),text="Search By",padx=2,bg="red", fg="White")
+        lblSearch.grid(row=0,column=5,sticky=W)
+
+        #variable
+        self.search_var=StringVar()
+        search_combo=ttk.Combobox(ButtonFrame,textvariable=self.search_var,width=12,font =('arial', 17,"bold"),state ="readonly")
+        search_combo["values"]=("Ref_no", "MedName","LotNo")
+        search_combo.grid(row=0,column=6)
+        search_combo.current(0)
+
+        self.searchTxt_var=StringVar()
+        txtSearch=Entry(ButtonFrame,textvariable=self.searchTxt_var,bd=3,relief=RIDGE,width=12,font =('arial', 17,"bold"))
+        txtSearch.grid(row=0,column=7)
+
+        SearchData=Button(ButtonFrame,command=self.search_data,text="SEARCH",font =('arial', 17,"bold"),bg="white",width=13, fg="dark seagreen")
+        SearchData.grid(row=0,column=8)
+
+        ShowAllData=Button(ButtonFrame,command=self.fatch_data,text="SHOW ALL",font =('arial', 17,"bold"),width=13,bg="white", fg="dark seagreen")
+        ShowAllData.grid(row=0,column=9)
+
+#Label and Entries=====================================================================================================================================================================================================================================================
+        def update_ref_values():
+            conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+            my_cursor = conn.cursor()
+            my_cursor.execute("select Ref from pharmacy123")
+            row = my_cursor.fetchall()
+            ref_combo["values"] = row
+            root.after(5000, update_ref_values)  # Update the values every 5 seconds
+
+
+        lblrefnum = Label(DataFrameLeft, font=("arial", 12, "bold"), text="Reference Number", padx=2, pady=6,
+                          fg="#8EE5EE")
+        lblrefnum.grid(row=0, column=0, sticky=W)
+
+        ref_combo = ttk.Combobox(DataFrameLeft, textvariable=self.ref_var, state="readonly", font=("arial", 12, "bold"),
+                                 width=27)
+        ref_combo.grid(row=0, column=1)
+
+        update_ref_values()  # Start updating the values of the combobox
+        
+        lblrefno=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Reference Number",padx=2)
+        lblrefno.grid(row=0,column=0,sticky="W")
+
+        conn = mysql.connector.connect(host="localhost"
+                                           , username="root"
+                                           , password="pooleJordan3",
+                                           database="pharmacyia")
+        my_cursor = conn.cursor()
+        my_cursor.execute("select Ref from pharmacy123")
+        row=my_cursor.fetchall()
+
+        ref_combo=ttk.Combobox(DataFrameLeft,textvariable=self.ref_var,width=28,font=("arial", 12,"bold"), state="readonly")
+        ref_combo["values"]=row
+        ref_combo.grid(row=0,column=1)
+        ref_combo.current(0)
+
+        lblcomp=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Company Name:",padx=2)
+        lblcomp.grid(row=1,column=0,sticky="W")
+        txtcomp=Entry(DataFrameLeft, textvariable= self.cmpName_var, font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtcomp.grid(row=1,column=1)
+
+        lbltype=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Type of Medicine",padx=2)
+        lbltype.grid(row=2,column=0,sticky="W")
+
+        type_combo=ttk.Combobox(DataFrameLeft, textvariable=self.typeMed_var, width=28,font=("arial", 12,"bold"), state="readonly")
+        type_combo["values"]=("Tablet","Liquid","Capsules", "Topical Medicines", "Drops", "Inhales", "Injection")
+        type_combo.grid(row=2,column=1)
+        type_combo.current(0)
+
+        def update_med_values():
+            conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+            my_cursor = conn.cursor()
+            my_cursor.execute("select MedName from pharmacy123")
+            row12 = my_cursor.fetchall()
+            medname_combo["values"] = row12
+            root.after(5000, update_med_values)  #
+
+        lblmedname=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Medicine Name",padx=2)
+        lblmedname.grid(row=3,column=0,sticky="W")
+
+        conn = mysql.connector.connect(host="localhost"
+                                           , username="root"
+                                           , password="pooleJordan3",
+                                           database="pharmacyia")
+        my_cursor = conn.cursor()
+        my_cursor.execute("select MedName from pharmacy123")
+        med=my_cursor.fetchall()
+
+        medname_combo=ttk.Combobox(DataFrameLeft,textvariable=self.medName_var, width=28,font=("arial", 12,"bold"), state="readonly")
+        medname_combo["values"]=med
+        medname_combo.grid(row=3,column=1)
+        update_med_values()
+        medname_combo.current(0)
+        
+
+        lbllot=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Lot No:",padx=2)
+        lbllot.grid(row=4,column=0,sticky="W")
+        txtlot=Entry(DataFrameLeft,textvariable=self.lot_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtlot.grid(row=4,column=1)
+
+        lblissue=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Issued Date:",padx=2)
+        lblissue.grid(row=5,column=0,sticky="W")
+        txtissue=Entry(DataFrameLeft,textvariable=self.issuedate_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtissue.grid(row=5,column=1)
+
+        lblexpdate=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Expiring Date:",padx=2)
+        lblexpdate.grid(row=6,column=0,sticky="W")
+        txtexpdate=Entry(DataFrameLeft,textvariable=self.expdate_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtexpdate.grid(row=6,column=1)
+
+        lbluses=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Uses:",padx=2)
+        lbluses.grid(row=7,column=0,sticky="W")
+        txtuses=Entry(DataFrameLeft,textvariable=self.uses_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtuses.grid(row=7,column=1)
+
+        lblside=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Side Effects:",padx=2)
+        lblside.grid(row=8,column=0,sticky="W")
+        txtside=Entry(DataFrameLeft,textvariable=self.sideEffect_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtside.grid(row=8,column=1)
+
+        lblprec=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Prec & Warnings:",padx=2)
+        lblprec.grid(row=0,column=3,sticky="W")
+        txtprec=Entry(DataFrameLeft,textvariable=self.warning_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtprec.grid(row=0,column=4)
+
+        lbldosage=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Dosage:",padx=2)
+        lbldosage.grid(row=1,column=3,sticky="W")
+        txtdosage=Entry(DataFrameLeft,textvariable=self.dosage_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtdosage.grid(row=1,column=4)
+
+        lblprice=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Price:",padx=2)
+        lblprice.grid(row=2,column=3,sticky="W")
+        txtprice=Entry(DataFrameLeft,textvariable=self.price_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtprice.grid(row=2,column=4)
+        
+        lblprod=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Product QT:",padx=2)
+        lblprod.grid(row=3,column=3,sticky="W")
+        txtprod=Entry(DataFrameLeft,textvariable=self.product_var,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 28)
+        txtprod.grid(row=3,column=4)
+        
+#DataFrameLeft Image=====================================================================================================================================================================================================================================================
+        lblimg=Label(DataFrameLeft,font =('arial', 12,"bold"),text="Quality and affordable",padx=2)
+        lblimg.place(x=550,y=300)
+
+        img2=Image.open("/Users/aryashrestha/Desktop/medpro/medprodental.png")
+        img2=img2.resize((150,155),Image.LANCZOS)
+        self.photoimg2=ImageTk.PhotoImage(img2)
+        b1=Button(self.root,image=self.photoimg2,borderwidth=0)
+        b1.place(x=480,y=290)
+
+        img3=Image.open("/Users/aryashrestha/Desktop/medpro/pharmacy-canada-prescription-drugs.webp")
+        img3=img3.resize((250,155),Image.LANCZOS)
+        self.photoimg3=ImageTk.PhotoImage(img3)
+        b1=Button(self.root,image=self.photoimg3,borderwidth=0)
+        b1.place(x=640,y=290)
+        
+#DataFrameRight=====================================================================================================================================================================================================================================================
+        DataFrameRight=LabelFrame(DataFrame,bd=10,relief=RIDGE,padx=20,text="ADDING DEPARTMENT",fg="dark green", font =('arial', 12,"bold"))
+        DataFrameRight.place(x=910,y=5,width=540,height=350)
+
+        img4=Image.open("/Users/aryashrestha/Desktop/medpro/3896.webp")
+        img4=img4.resize((150,85),Image.LANCZOS)
+        self.photoimg4=ImageTk.PhotoImage(img4)
+        b1=Button(self.root,image=self.photoimg4,borderwidth=0)
+        b1.place(x=960,y=160)
+
+        img5=Image.open("/Users/aryashrestha/Desktop/medpro/best_universities_for_pharmacy_2013.jpg.webp")
+        img5=img5.resize((150,85),Image.LANCZOS)
+        self.photoimg5=ImageTk.PhotoImage(img5)
+        b1=Button(self.root,image=self.photoimg5,borderwidth=0)
+        b1.place(x=1113,y=160)
+
+        img6=Image.open("/Users/aryashrestha/Desktop/medpro/4410eb5bfc648da9755e511dc5f38910.Pills-On-Leaf-Square-circle-960a1f09da4a11ad358018415a59e653-618c4a4794043.webp")
+        img6=img6.resize((135,135),Image.LANCZOS)
+        self.photoimg6=ImageTk.PhotoImage(img6)
+        b1=Button(self.root,image=self.photoimg6,borderwidth=0)
+        b1.place(x=1303,y=160)
+
+        lblrefnumb=Label(DataFrameRight,font =('arial', 13,"bold"),text="Reference No:",padx=2)
+        lblrefnumb.place(x=5,y=100)
+        txtrefnumb=Entry(DataFrameRight,textvariable=self.refmed,font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 21)
+        txtrefnumb.place(x=105,y=100)
+
+        lblmedname=Label(DataFrameRight, font =('arial', 13,"bold"),text="Med Name:",padx=2)
+        lblmedname.place(x=5,y=124)
+        txtmedname=Entry(DataFrameRight,textvariable=self.addmedvar, font =('arial',13,'bold'),bg = 'white', bd = 2, relief = RIDGE,width = 21)
+        txtmedname.place(x=105,y=124)
+        
+#Side Frame=====================================================================================================================================================================================================================================================
+        side_frame=Frame(DataFrameRight,bd=4,relief=RIDGE,bg='white')
+        side_frame.place(x=0,y=150,width=285,height=160)
+
+        sc_x=ttk.Scrollbar(side_frame,orient=HORIZONTAL)
+        sc_x.pack(side=BOTTOM,fill=X)
+        sc_y=ttk.Scrollbar(side_frame,orient=VERTICAL)
+        sc_y.pack(side=RIGHT,fill=Y)
+
+        self.medicine_table=ttk.Treeview(side_frame,column=("ref","medname"),xscrollcommand=sc_x.set,yscrollcommand=sc_y.set)
+
+        sc_x.config(command=self.medicine_table.xview)
+        sc_y.config(command=self.medicine_table.yview)
+
+        self.medicine_table.heading("ref",text="Reference Number")
+        self.medicine_table.heading("medname",text="Medicine Name")
+
+        self.medicine_table["show"]="headings"
+        self.medicine_table.pack(fill=BOTH,expand=1)
+
+        self.medicine_table.column("ref",width=100)
+        self.medicine_table.column("medname",width=100)
+
+        self.medicine_table.bind("<ButtonRelease-1>", self.Medget_cursor)
+
+#Medicine Add Buttons=====================================================================================================================================================================================================================================================
+        down_frame=Frame(DataFrameRight,bd=4,relief=RIDGE,bg='darkgreen')
+        down_frame.place(x=330,y=150,width=135,height=160)
+
+        btnAddmed=Button(down_frame,text="ADD",font =('arial', 12,"bold"),width=13,bg="lime", fg="green",pady=4,cursor= 'hand1', command=self.addmed)
+        btnAddmed.grid(row=0,column=0)
+
+        btnUpdatemed=Button(down_frame,text="UPDATE", command = self.UpdateMed, font =('arial', 12,"bold"),width=13,bg="lime", fg="purple",pady=4)
+        btnUpdatemed.grid(row=1,column=0)
+
+        btnDeletemed=Button(down_frame,command = self.DeleteMed, text="DELETE",font =('arial', 12,"bold"),width=13,bg="lime", fg="red",pady=4)
+        btnDeletemed.grid(row=2,column=0)
+
+        btnClearmed=Button(down_frame, command=self.ClearMed, text="CLEAR",font =('arial', 12,"bold"),width=13,bg="lime", fg="orange",pady=4)
+        btnClearmed.grid(row=3,column=0)
+
+#Frame Details=====================================================================================================================================================================================================================================================
+        Framedetails=Frame(self.root,bd=15,relief=RIDGE,bg='white')
+        Framedetails.place(x=0,y=580,width=1530,height=210)
+        
+
+#Main Table and Scrollbar=====================================================================================================================================================================================================================================================
+        Table_frame=Frame(self.root,bd=15,relief=RIDGE)
+        Table_frame.place(x=0,y=580,width=1530,height=210)
+
+
+        scroll_x=ttk.Scrollbar(Table_frame,orient=HORIZONTAL)
+        scroll_x.pack(side=BOTTOM,fill=X)
+        scroll_y=ttk.Scrollbar(Table_frame,orient=VERTICAL)
+        scroll_y.pack(side=RIGHT,fill=Y)
+
+        self.pharmacy_table=ttk.Treeview(Table_frame,column=("ref","companyname","type","tabletname", "lotno","issuedate","expdate","uses",
+                                                             'sideeffect','warning','dosage','price','productqt')
+                                                             ,xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+        scroll_x.pack(side=BOTTOM,fill=X)
+        scroll_y.pack(side=RIGHT,fill=Y)
+
+        scroll_x.config(command=self.pharmacy_table.xview)
+        scroll_y.config(command=self.pharmacy_table.yview)
+
+        self.pharmacy_table["show"]="headings"
+
+        self.pharmacy_table.heading("ref",text="Reference No")
+        self.pharmacy_table.heading("companyname",text="Company Name")
+        self.pharmacy_table.heading("type",text="Type of Medicine")
+        self.pharmacy_table.heading("tabletname",text="Tablet Name")
+        self.pharmacy_table.heading("lotno",text="Lot No")
+        self.pharmacy_table.heading("issuedate",text="Issued Date")
+        self.pharmacy_table.heading("expdate",text="Exp Date")
+        self.pharmacy_table.heading("uses",text="Uses")
+        self.pharmacy_table.heading("sideeffect",text="Side Effects")
+        self.pharmacy_table.heading("warning",text="Prec&Warnings")
+        self.pharmacy_table.heading("dosage",text="Dosage")
+        self.pharmacy_table.heading("price",text="Price")
+        self.pharmacy_table.heading("productqt",text="Product Qts")
+        self.pharmacy_table.pack(fill=BOTH,expand=1)
+
+        self.pharmacy_table.column("ref",width=100)
+        self.pharmacy_table.column("companyname",width=100)
+        self.pharmacy_table.column("type",width=100)
+        self.pharmacy_table.column("tabletname",width=100)
+        self.pharmacy_table.column("type",width=100)
+        self.pharmacy_table.column("tabletname",width=100)
+        self.pharmacy_table.column("lotno",width=100)
+        self.pharmacy_table.column("issuedate",width=100)
+        self.pharmacy_table.column("expdate",width=100)
+        self.pharmacy_table.column("uses",width=100)
+        self.pharmacy_table.column("sideeffect",width=100)
+        self.pharmacy_table.column("warning",width=100)
+        self.pharmacy_table.column("dosage",width=100)
+        self.pharmacy_table.column("price",width=100)
+        self.pharmacy_table.column("productqt",width=100)
+        self.fetch_data_medicine()
+        self.fatch_data()
+        self.pharmacy_table.bind("<ButtonRelease-1>",self.get_cursor)
+
+#===============================================================================Functionality Declarations=====================================================================================================================================================================================================================================================
+#RIGHT FRAME ADD MED=====================================================================================================================================================================================================================================================
+    def addmed(self):
+            conn = mysql.connector.connect(host="localhost"
+                                           , username="root"
+                                           , password="pooleJordan3",
+                                           database="pharmacyia")
+            my_cursor = conn.cursor()
+            my_cursor.execute("insert into pharmacy123(Ref,MedName) values(%s,%s)",
+                              (self.refmed.get(),
+                               self.addmedvar.get(),
+                               ))
+            conn.commit()
+            self.fetch_data_medicine()
+            self.Medget_cursor()
+            conn.close()
+            messagebox.showinfo("Success", "Medicine has been added")
+
+
+
+
+#RIGHT FRAME FETCH DATA=========================================================================================================================================================================================
+    def fetch_data_medicine(self):
+        conn = mysql.connector.connect(host='localhost',
+                                       username='root',
+                                       password='pooleJordan3',
+                                       database='pharmacyia')
+        my_cursor=conn.cursor()
+        my_cursor.execute("select * from pharmacy123")
+        rows=my_cursor.fetchall()
+        if len(rows)!=0:
+            self.medicine_table.delete(*self.medicine_table.get_children())
+            for i in rows:
+                self.medicine_table.insert("",END,values=i)
+                conn.commit()
+        conn.close()
+
+
+
+
+#RIGHT FRAME GET CURSOR=========================================================================================================================================================================================
+    def Medget_cursor(self,event=""):
+        cursor_row=self.medicine_table.focus()
+        content=self.medicine_table.item(cursor_row)
+        row=content["values"]
+        self.refmed.set(row[0])
+        self.addmedvar.set(row[1])
+
+
+
+#RIGHT FRAME UPDATE=========================================================================================================================================================================================
+    def UpdateMed(self):
+        if self.refmed.get() == "" or self.addmedvar.get() == "":
+            messagebox.showerror("Error", "All fields are required to update medicine!")
+        else:
+            conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+            my_cursor = conn.cursor()
+
+        #Checking if the number exists in the database
+        my_cursor.execute("SELECT * FROM pharmacy123 WHERE Ref = %s", (self.refmed.get(),))
+        row = my_cursor.fetchone()
+        if row is None:
+            messagebox.showerror("Error", "Reference Number not found in the database!")
+        else:
+            my_cursor.execute("UPDATE pharmacy123 SET Ref = %s, MedName = %s WHERE Ref = %s",
+                              (self.refmed.get(), self.addmedvar.get(), self.refmed.get()))
+            conn.commit()
+            self.fetch_data_medicine()
+            conn.close()
+
+            messagebox.showinfo("Success", "Successfully updated the data")
+
+
+
+
+#RIGHT FRAME DELETE MED=========================================================================================================================================================================================
+    def DeleteMed(self):
+        conn = mysql.connector.connect(host="localhost"
+                                           , username="root"
+                                           , password="pooleJordan3",
+                                           database="pharmacyia")
+        my_cursor = conn.cursor()
+        sql = "delete from pharmacy123 where Ref=%s"
+        val=(self.refmed.get(),)
+        my_cursor.execute(sql,val)
+        conn.commit()
+        self.fetch_data_medicine()
+        conn.close()
+         
+    
+
+
+
+    def ClearMed(self):
+        self.refmed.set("")
+        self.addmedvar.set("")
+
+    
+    
+    
+    
+    #Main Table=====================================================================================================================================================================================================================================================
+    def add_data(self):
+        if self.ref_var.get() == "" or self.lot_var.get() == "":
+            messagebox.showerror("Error", "Reference number and Lot number are required!")
+        else:
+            conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+            my_cursor = conn.cursor()
+            my_cursor.execute("INSERT INTO downframepharma(Ref_No, CmpName, TypeMed, MedName, LotNo, Issuedate, Expdate, Uses, Sideeffect, warning, dosage, Price, product) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                          (self.ref_var.get(), self.cmpName_var.get(), self.typeMed_var.get(), self.medName_var.get(),
+                           self.lot_var.get(), self.issuedate_var.get(), self.expdate_var.get(), self.uses_var.get(),
+                           self.sideEffect_var.get(), self.warning_var.get(), self.dosage_var.get(), self.price_var.get(),
+                           self.product_var.get()))
+            conn.commit()
+            conn.close()
+            self.fatch_data()
+            self.fetch_data_medicine()
+            messagebox.showinfo("Success!", "Data has been added!")
+
+
+#DOWN FRAME FATCH DATA=========================================================================================================================================================================================
+    def fatch_data(self):
+        conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+        my_cursor = conn.cursor()
+        my_cursor.execute("select * from downframepharma")
+        row=my_cursor.fetchall()
+        if len(row)!=0:
+            self.pharmacy_table.delete(*self.pharmacy_table.get_children())
+            for q in row:
+                self.pharmacy_table.insert("",END,values=q)
+                conn.commit()
+            conn.close()
+
+
+#DOWN FRAME CURSOR=========================================================================================================================================================================================
+    def get_cursor(self, event=""):
+        cursorrow = self.pharmacy_table.focus()
+        content = self.pharmacy_table.item(cursorrow)
+        row = content["values"]
+
+        self.ref_var.set(row[0]),
+        self.cmpName_var.set(row[1]),
+        self.typeMed_var.set(row[2]),
+        self.medName_var.set(row[3]),
+        self.lot_var.set(row[4]),
+        self.issuedate_var.set(row[5]),
+        self.expdate_var.set(row[6]),
+        self.uses_var.set(row[7]),
+        self.sideEffect_var.set(row[8]),
+        self.warning_var.set(row[9]),
+        self.dosage_var.set(row[10]),
+        self.price_var.set(row[11]),
+        self.product_var.set(row[12])
+
+
+#LEFT FRAME UPDATE=========================================================================================================================================================================================
+    def Update(self):
+        if self.ref_var.get() == "" or self.lot_var.get() == "":
+            messagebox.showerror("Error", "All fields are required to update medicine!")
+        else:
+            try:
+                ref_no = int(self.ref_var.get())
+            except ValueError:
+                messagebox.showerror("Error", "Ref_no must be a valid integer!")
+            return
+
+        conn = mysql.connector.connect(host='localhost',
+                                       username='root',
+                                       password='pooleJordan3',
+                                       database='pharmacyia')
+        my_cursor = conn.cursor()
+        my_cursor.execute('UPDATE downframepharma SET CmpName=%s, TypeMed=%s, MedName=%s, LotNo=%s, Issuedate=%s, Expdate=%s, Uses=%s, Sideeffect=%s, warning=%s, dosage=%s, Price=%s, product=%s WHERE Ref_no=%s', (
+            self.cmpName_var.get(),
+            self.typeMed_var.get(),
+            self.medName_var.get(),
+            self.lot_var.get(),
+            self.issuedate_var.get(),
+            self.expdate_var.get(),
+            self.uses_var.get(),
+            self.sideEffect_var.get(),
+            self.warning_var.get(),
+            self.dosage_var.get(),
+            self.price_var.get(),
+            self.product_var.get(),
+            ref_no  # Provide the integer value for Ref_no
+        ))
+        conn.commit()
+        self.fatch_data()
+        conn.close()
+        messagebox.showinfo("UPDATE", "Record has been updated successfully!")
+
+
+#LEFT FRAME DELETE=========================================================================================================================================================================================
+    def Delete(self):
+        conn = mysql.connector.connect(host="localhost"
+                                           , username="root"
+                                           , password="pooleJordan3",
+                                           database="pharmacyia")
+        my_cursor = conn.cursor()
+        sql = "delete from downframepharma where Ref_no=%s"
+        val=(self.ref_var.get(),)
+        my_cursor.execute(sql,val)
+        conn.commit()
+        self.fatch_data()
+        conn.close()
+        messagebox.showinfo("DELETE","Information has been deleted successfully!")
+    
+
+#LEFT FRAME RESET=========================================================================================================================================================================================
+    def reset(self):
+                self.ref_var.set(""),
+                self.cmpName_var.set(""),
+                self.typeMed_var.set(""),
+                self.medName_var.set(""),
+                self.lot_var.set(""),
+                self.issuedate_var.set(""),
+                self.expdate_var.set(""),
+                self.uses_var.set(""),
+                self.sideEffect_var.set(""),
+                self.warning_var.set(""),
+                self.dosage_var.set(""),
+                self.price_var.set(""),
+                self.product_var.set(""),
+                self.ref_var.set("")
+    
+#LEFT FRAME SEARCH DATA============================================================================================================================================================================================
+    def search_data(self):
+        conn = mysql.connector.connect(host="localhost", username="root", password="pooleJordan3", database="pharmacyia")
+        my_cursor = conn.cursor()
+
+        my_cursor.execute("SELECT * FROM downframepharma WHERE " + str(self.search_var.get()) + " LIKE '" + str(self.searchTxt_var.get()) + "%'")
+
+        rows = my_cursor.fetchall()
+
+        if len(rows) != 0:
+            self.pharmacy_table.delete(*self.pharmacy_table.get_children())
+            for s in rows:
+                self.pharmacy_table.insert("", END, values=s)
+
+                conn.commit()
+            conn.close()
+
+
+
+
+
+if __name__ == "__main__":
+    root =Tk()
+    obj=PharmacyManagementSyatem(root)
+    root.mainloop()
+
